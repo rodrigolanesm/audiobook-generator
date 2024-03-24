@@ -5,7 +5,7 @@ Data de Criação: 21/03/2024
 Última Atualização: 21/03/2024 - 17:23:47
 Linguagem: Python
 
-Descrição: Menu inicial
+Descrição: Função main
 
 """
 
