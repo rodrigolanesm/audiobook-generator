@@ -2,7 +2,7 @@
 Nome: Henrique Andrade
 E-mail: henrique.andrade@academico.ufpb.br
 Data de Criação: 21/03/2024
-Última Atualização: 21/03/2024 - 17:23:47
+Última Atualização: 24/03/2024 - 16:52:31
 Linguagem: Python
 
 Descrição: Realizar a leitura dos arq, limitando quant. de palavras
@@ -15,6 +15,8 @@ import fitz, re, ebooklib
 
 class LeitorArquivos:
     
+    extensoes = ["EPUB", "DOCX", "PDF", "MOBI"]
+  
     def extrair_texto_epub(arquivo_epub, limite_palavras):
         livro = epub.read_epub(arquivo_epub)
         texto_completo = ''
