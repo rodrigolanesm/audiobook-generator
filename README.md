@@ -13,6 +13,12 @@ No terminal, instale as seguintes bibliotecas:
 
 `pip install python-docx`
 
+## Execução
+
+Para executar o programa, abra o terminal na pasta onde foi extraído o arquivo e digite:
+
+`python main.py`
+
 ## Objetivo
 
 O principal propósito deste projeto é oferecer uma solução que atenda às necessidades de diferentes tipos de usuários, incluindo aqueles com dificuldades de leitura, pessoas ocupadas que desejam consumir conteúdo enquanto realizam outras atividades e indivíduos que preferem a experiência auditiva à leitura tradicional. Ao criar uma plataforma robusta e intuitiva, buscamos promover a democratização do acesso à informação e à cultura por meio da tecnologia.
