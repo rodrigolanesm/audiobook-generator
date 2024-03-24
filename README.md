@@ -2,6 +2,17 @@
 
 Este repositório abriga o desenvolvimento de um Gerador de Audiobooks, um projeto voltado para tornar a experiência de leitura mais acessível, personalizada e interativa. Nosso objetivo principal é criar uma plataforma capaz de transformar textos de diversos formatos em audiobooks dinâmicos e personalizáveis, permitindo aos usuários desfrutar de conteúdo escrito de uma maneira auditiva e imersiva.
 
+## Instalação
+
+Clone o repositório em sua máquina ou baixe o arquivo .zip e extraia-o.
+No terminal, instale as seguintes bibliotecas:
+
+`pip install ebooklib`
+
+`pip install --upgrade pymupdf`
+
+`pip install python-docx`
+
 ## Objetivo
 
 O principal propósito deste projeto é oferecer uma solução que atenda às necessidades de diferentes tipos de usuários, incluindo aqueles com dificuldades de leitura, pessoas ocupadas que desejam consumir conteúdo enquanto realizam outras atividades e indivíduos que preferem a experiência auditiva à leitura tradicional. Ao criar uma plataforma robusta e intuitiva, buscamos promover a democratização do acesso à informação e à cultura por meio da tecnologia.
