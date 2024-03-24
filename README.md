@@ -19,4 +19,4 @@ Estes são apenas alguns dos recursos planejados, com a intenção de oferecer u
 
 ## Contribuição
 
-Este projeto está sendo desenvolvido como parte integrante da avaliação da disciplina "Engenharia de Software", ministrada pelo Professor Gledson Elias da Silveira, na Universidade Federal da Paraíba, no curso de graduação de Engenharia da Computação. Os alunos responsáveis pelo desenvolvimento são: Rodrigo Lanes, Henrique Andrade, Rivando Neto, Rodrigo Oliveira, Vito Elias, Saulo Costa.
+Este projeto está sendo desenvolvido como parte integrante da avaliação da disciplina "Engenharia de Software", ministrada pelo Professor Gledson Elias da Silveira, na Universidade Federal da Paraíba, no curso de graduação de Engenharia da Computação. Os alunos responsáveis pelo desenvolvimento são: Rodrigo Lanes, Henrique Andrade, Rivando Neto, Rodrigo Oliveira, Vito Elias e Saulo Costa.
