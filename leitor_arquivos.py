@@ -2,10 +2,10 @@
 Nome: Henrique Andrade
 E-mail: henrique.andrade@academico.ufpb.br
 Data de Criação: 21/03/2024
-Última Atualização: 24/03/2024 - 16:52:31
+Última Atualização: 26/03/2024 - 19:33:55
 Linguagem: Python
 
-Descrição: Realizar a leitura dos arq, limitando quant. de palavras
+Descrição: Realizar a leitura dos arquivos
 
 """
 
@@ -17,7 +17,7 @@ class LeitorArquivos:
     
     extensoes = ["EPUB", "DOCX", "PDF", "MOBI"]
   
-    def extrair_texto_epub(arquivo_epub, limite_palavras):
+    def extrair_texto_epub(arquivo_epub, limite_palavras, posicao_leitura):
         livro = epub.read_epub(arquivo_epub)
         texto_completo = ''
         for item in livro.get_items():
@@ -28,10 +28,10 @@ class LeitorArquivos:
                 palavras = texto_completo.split()
                 if len(palavras) >= limite_palavras:
                     break
-        return ' '.join(palavras[:limite_palavras])
+        return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
 
     
-    def extrair_texto_docx(arquivo_docx, limite_palavras):
+    def extrair_texto_docx(arquivo_docx, limite_palavras, posicao_leitura):
         doc = Document(arquivo_docx)
         texto_completo = ''
         for paragraph in doc.paragraphs:
@@ -39,10 +39,10 @@ class LeitorArquivos:
             palavras = texto_completo.split()
             if len(palavras) >= limite_palavras:
                 break
-        return ' '.join(palavras[:limite_palavras])
+        return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
 
     
-    def extrair_texto_pdf(arquivo_pdf, limite_palavras):
+    def extrair_texto_pdf(arquivo_pdf, limite_palavras, posicao_leitura):
         texto_completo = ''
         doc = fitz.open(arquivo_pdf)
         for page_num in range(len(doc)):
@@ -51,10 +51,10 @@ class LeitorArquivos:
             palavras = texto_completo.split()
             if len(palavras) >= limite_palavras:
                 break
-        return ' '.join(palavras[:limite_palavras])
+        return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
 
     
-    def extrair_texto_mobi(arquivo_mobi, limite_palavras):
+    def extrair_texto_mobi(arquivo_mobi, limite_palavras, posicao_leitura):
         texto_completo = ''
         doc = fitz.open(arquivo_mobi)
         for page_num in range(len(doc)):
@@ -63,4 +63,4 @@ class LeitorArquivos:
             palavras = texto_completo.split()
             if len(palavras) >= limite_palavras:
                 break
-        return ' '.join(palavras[:limite_palavras])
+        return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
