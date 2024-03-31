@@ -2,7 +2,7 @@
 Nome: Henrique Andrade
 E-mail: henrique.andrade@academico.ufpb.br
 Data de Criação: 21/03/2024
-Última Atualização: 26/03/2024 - 19:33:55
+Última Atualização: 31/03/2024 - 18:02:43
 Linguagem: Python
 
 Descrição: Menu inicial
@@ -39,9 +39,16 @@ class Menu:
                 continue
             
             tipo_arquivo = LeitorArquivos.extensoes[int(opcao) - 1]
-            arquivo = input(f"Digite o nome do arquivo ({tipo_arquivo}): ")
+            arquivo = input(f"Digite o nome do arquivo ({tipo_arquivo}) | (ex:. nome_arq.tipo_arq) : ")
             posicao_leitura = 0
-            limite_palavras = 25
+
+            # Estimativa média da quantidade de palavras por página do arquivo 275
+            limite_palavras = 20
+
+            historico = self.carregar_historico()
+            if arquivo in historico:
+                posicao_leitura = historico[arquivo]
+                print(f"Retomando leitura do arquivo {arquivo} na posição {posicao_leitura}.")
 
             while True:
                 texto = None
@@ -62,7 +69,7 @@ class Menu:
                 if continuar == "n":
                     break
                 elif continuar == "s":
-                    opcao_continuar = input("Deseja:\n1. Voltar para a leitura anterior\n2. Repetir a leitura\n3. Prosseguir com a leitura\nDigite o número da opção desejada: ")
+                    opcao_continuar = input("Deseja:\n1. Ir para a página anterior\n2. Repetir a página\n3. Ir para a próxima página\nDigite o número da opção desejada: ")
                     if opcao_continuar == "1" and posicao_leitura >= limite_palavras:
                         posicao_leitura -= limite_palavras
                     elif opcao_continuar == "2":
@@ -72,6 +79,27 @@ class Menu:
                     else:
                         print("Opção inválida. Voltando para o menu inicial.")
                         break
+
+            # Salvar informações de leitura no histórico
+            self.salvar_historico(arquivo, posicao_leitura)
+
+    def carregar_historico(self):
+        historico = {}
+        try:
+            with open("historico.txt", "r") as file:
+                for line in file:
+                    arquivo, posicao_leitura = line.strip().split("|")
+                    historico[arquivo] = int(posicao_leitura)
+        except FileNotFoundError:
+            pass
+        return historico
+
+    def salvar_historico(self, arquivo, posicao_leitura):
+        historico = self.carregar_historico()
+        historico[arquivo] = posicao_leitura
+        with open("historico.txt", "w") as file:
+            for arquivo, posicao_leitura in historico.items():
+                file.write(f"{arquivo}|{posicao_leitura}\n")
 
 if __name__ == "__main__":
     menu = Menu()
