@@ -2,7 +2,7 @@
 Nome: Henrique Andrade
 E-mail: henrique.andrade@academico.ufpb.br
 Data de Criação: 21/03/2024
-Última Atualização: 31/03/2024 - 18:02:43
+Última Atualização: 09/04/2024 - 17:42:28
 Linguagem: Python
 
 Descrição: Menu inicial
@@ -22,16 +22,40 @@ class Menu:
 
     def exibir_menu(self):
         while True:
+            print("Escolha o tipo de ação:")
+            print("1. Ler arquivo")
+            print("2. Limpar histórico de um arquivo específico")
+            print("3. Limpar histórico de todos os arquivos")
+            print("4. Sair")
+            opcao = input("Digite o número da opção desejada: ")
+            
+            if opcao == "4":
+                print("Saindo do programa...")
+                break
+            
+            if opcao not in ["1", "2", "3"]:
+                print("Opção inválida. Por favor, escolha uma das opções disponíveis.")
+                continue
+            
+            if opcao == "1":
+                self.ler_arquivo()
+            elif opcao == "2":
+                self.limpar_historico_arquivo()
+            elif opcao == "3":
+                self.limpar_historico_todos()
+
+    def ler_arquivo(self):
+        while True:
             print("Escolha o tipo de arquivo:")
             print("1. EPUB")
             print("2. DOCX")
             print("3. PDF")
             print("4. MOBI")
-            print("5. Sair")
+            print("5. Voltar")
             opcao = input("Digite o número da opção desejada: ")
             
             if opcao == "5":
-                print("Saindo do programa...")
+                print("Voltando ao menu principal...")
                 break
             
             if opcao not in ["1", "2", "3", "4"]:
@@ -100,6 +124,25 @@ class Menu:
         with open("historico.txt", "w") as file:
             for arquivo, posicao_leitura in historico.items():
                 file.write(f"{arquivo}|{posicao_leitura}\n")
+
+    def limpar_historico_arquivo(self):
+        arquivo = input("Digite o nome do arquivo para limpar o histórico: ")
+        historico = self.carregar_historico()
+        if arquivo in historico:
+            del historico[arquivo]
+            with open("historico.txt", "w") as file:
+                for arquivo_historico, posicao_leitura in historico.items():
+                    file.write(f"{arquivo_historico}|{posicao_leitura}\n")
+            print(f"Histórico do arquivo {arquivo} limpo com sucesso.")
+        else:
+            print(f"Nenhum histórico encontrado para o arquivo {arquivo}.")
+
+    def limpar_historico_todos(self):
+        try:
+            open("historico.txt", "w").close()
+            print("Histórico de todos os arquivos limpo com sucesso.")
+        except Exception as e:
+            print("Erro ao limpar o histórico de todos os arquivos:", e)
 
 if __name__ == "__main__":
     menu = Menu()
