@@ -7,6 +7,8 @@ Este repositório abriga o desenvolvimento de um Gerador de Audiobooks, um proje
 Clone o repositório em sua máquina ou baixe o arquivo .zip e extraia-o.
 No terminal, instale as seguintes bibliotecas:
 
+`pip install pyttsx3`
+
 `pip install ebooklib`
 
 `pip install --upgrade pymupdf`
@@ -18,6 +20,8 @@ No terminal, instale as seguintes bibliotecas:
 Para executar o programa, abra o terminal na pasta onde foi extraído o arquivo e digite:
 
 `python main.py`
+
+Para garantir o carregamento sem erro do histórico de um arquivo, evite a utilização de acentos ou caracteres especiais no nome dos mesmos, quando for realizar uma leitura.
 
 ## Objetivo
 
