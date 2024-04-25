@@ -2,7 +2,7 @@
 Nome: Henrique Andrade
 E-mail: henrique.andrade@academico.ufpb.br
 Data de Criação: 21/03/2024
-Última Atualização: 09/04/2024 - 17:42:28
+Última Atualização: 24/04/2024 - 22:37:45
 Linguagem: Python
 
 Descrição: Menu inicial
@@ -11,6 +11,7 @@ Descrição: Menu inicial
 
 import pyttsx3
 from leitor_arquivos import LeitorArquivos
+from interface import FileSelector
 
 class Menu:
     def __init__(self):
@@ -45,67 +46,52 @@ class Menu:
                 self.limpar_historico_todos()
 
     def ler_arquivo(self):
+        file_selector = FileSelector()
+        file_selector.mainloop()
+        arquivo_selecionado = file_selector.file_path
+
+        if not arquivo_selecionado:
+            print("Nenhum arquivo selecionado.")
+            return
+
+        tipo_arquivo = LeitorArquivos.get_tipo_arquivo(arquivo_selecionado)
+        if tipo_arquivo is None:
+            print("Tipo de arquivo não suportado.")
+            return
+
+        posicao_leitura = 0
+        # Estimativa média da quantidade de palavras por página do arquivo 275
+        limite_palavras = 20
+
+        historico = self.carregar_historico()
+        if arquivo_selecionado in historico:
+            posicao_leitura = historico[arquivo_selecionado]
+            print(f"Retomando leitura do arquivo {arquivo_selecionado} na posição {posicao_leitura}.")
+
         while True:
-            print("Escolha o tipo de arquivo:")
-            print("1. EPUB")
-            print("2. DOCX")
-            print("3. PDF")
-            print("4. MOBI")
-            print("5. Voltar")
-            opcao = input("Digite o número da opção desejada: ")
-            
-            if opcao == "5":
-                print("Voltando ao menu principal...")
+            texto = LeitorArquivos.extrair_texto(arquivo_selecionado, limite_palavras, posicao_leitura)
+
+            print("Texto extraído:")
+            print(texto)
+            self.falar(texto)
+
+            continuar = input("Deseja continuar a leitura deste arquivo? (s/n): ").lower()
+            if continuar == "n":
                 break
-            
-            if opcao not in ["1", "2", "3", "4"]:
-                print("Opção inválida. Por favor, escolha uma das opções disponíveis.")
-                continue
-            
-            tipo_arquivo = LeitorArquivos.extensoes[int(opcao) - 1]
-            arquivo = input(f"Digite o nome do arquivo ({tipo_arquivo}) | (ex:. nome_arq.tipo_arq) : ")
-            posicao_leitura = 0
-
-            # Estimativa média da quantidade de palavras por página do arquivo 275
-            limite_palavras = 20
-
-            historico = self.carregar_historico()
-            if arquivo in historico:
-                posicao_leitura = historico[arquivo]
-                print(f"Retomando leitura do arquivo {arquivo} na posição {posicao_leitura}.")
-
-            while True:
-                texto = None
-                if opcao == "1":
-                    texto = LeitorArquivos.extrair_texto_epub(arquivo, limite_palavras, posicao_leitura)
-                elif opcao == "2":
-                    texto = LeitorArquivos.extrair_texto_docx(arquivo, limite_palavras, posicao_leitura)
-                elif opcao == "3":
-                    texto = LeitorArquivos.extrair_texto_pdf(arquivo, limite_palavras, posicao_leitura)
-                elif opcao == "4":
-                    texto = LeitorArquivos.extrair_texto_mobi(arquivo, limite_palavras, posicao_leitura)
-
-                print("Texto extraído:")
-                print(texto)
-                self.falar(texto)
-
-                continuar = input("Deseja continuar a leitura deste arquivo? (s/n): ").lower()
-                if continuar == "n":
+            elif continuar == "s":
+                opcao_continuar = input("Deseja:\n1. Ir para a página anterior\n2. Repetir a página\n3. Ir para a próxima página\nDigite o número da opção desejada: ")
+                if opcao_continuar == "1" and posicao_leitura >= limite_palavras:
+                    posicao_leitura -= limite_palavras
+                elif opcao_continuar == "2":
+                    continue
+                elif opcao_continuar == "3":
+                    posicao_leitura += limite_palavras
+                else:
+                    print("Opção inválida. Voltando para o menu inicial.")
                     break
-                elif continuar == "s":
-                    opcao_continuar = input("Deseja:\n1. Ir para a página anterior\n2. Repetir a página\n3. Ir para a próxima página\nDigite o número da opção desejada: ")
-                    if opcao_continuar == "1" and posicao_leitura >= limite_palavras:
-                        posicao_leitura -= limite_palavras
-                    elif opcao_continuar == "2":
-                        continue
-                    elif opcao_continuar == "3":
-                        posicao_leitura += limite_palavras
-                    else:
-                        print("Opção inválida. Voltando para o menu inicial.")
-                        break
 
-            # Salvar informações de leitura no histórico
-            self.salvar_historico(arquivo, posicao_leitura)
+        # Salvar informações de leitura no histórico
+        self.salvar_historico(arquivo_selecionado, posicao_leitura)
 
     def carregar_historico(self):
         historico = {}
