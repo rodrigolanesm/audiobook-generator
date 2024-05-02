@@ -7,13 +7,7 @@ Este repositório abriga o desenvolvimento de um Gerador de Audiobooks, um proje
 Clone o repositório em sua máquina ou baixe o arquivo .zip e extraia-o.
 No terminal, instale as seguintes bibliotecas:
 
-`pip install pyttsx3`
-
-`pip install ebooklib`
-
-`pip install --upgrade pymupdf`
-
-`pip install python-docx`
+`pip install -r "requirements.txt"`
 
 ## Execução
 
