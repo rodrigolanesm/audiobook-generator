@@ -1,29 +1,19 @@
+"""
+Nome: Henrique Andrade
+E-mail: henrique.andrade@academico.ufpb.br
+Data de Criação: 21/03/2024
+Última Atualização: 24/04/2024 - 22:43:19
+Linguagem: Python
+
+Descrição: Realizar a leitura dos arquivos
+
+"""
+
 from ebooklib import epub
 from docx import Document
 import fitz, ebooklib, re
-from seletor_arquivos import SeletorArquivos
 
 class LeitorArquivos:
-    #O leitor de arquivos deve realizar 5 tarefas:
-    #1. selecionar um arquivo para leitura
-    #2. identificar o tipo do arquivo pela extensão
-    #3. extrair o texto do arquivo
-    #4. exibir o texto extraído em uma janela de texto
-    #5. executar em áudio o texto extraído
-    
-    #Observação: as tarefas 4 e 5 devem ser executadas simultaneamente
-    
-    def __init__(self):
-        self.selecionar_arquivo()
-        #self.identificar_tipo_arquivo()
-        #self.extrair_texto()
-        #self.exibir_texto_em_janela()
-        #self.executar_audio()
-    
-    #tarefa 1: selecionar um arquivo para leitura
-    def selecionar_arquivo(self):
-        seletor_arquivo = SeletorArquivos()
-    
     @staticmethod
     def get_tipo_arquivo(nome_arquivo):
         extensao = nome_arquivo.lower().split(".")[-1]
