@@ -1,3 +1,4 @@
+import tkinter as tk
 from ebooklib import epub
 from docx import Document
 import fitz, ebooklib, re
@@ -13,20 +14,25 @@ class LeitorArquivos:
     
     #Observação: as tarefas 4 e 5 devem ser executadas simultaneamente
     
+    
     def __init__(self):
+        self.arquivo = None
         self.selecionar_arquivo()
-        #self.identificar_tipo_arquivo()
-        #self.extrair_texto()
-        #self.exibir_texto_em_janela()
+        self.identificar_tipo_arquivo()
+        self.extrair_texto()
+        self.exibir_texto_em_janela()
         #self.executar_audio()
     
     #tarefa 1: selecionar um arquivo para leitura
     def selecionar_arquivo(self):
-        seletor_arquivo = SeletorArquivos()
-    
-    @staticmethod
-    def get_tipo_arquivo(nome_arquivo):
-        extensao = nome_arquivo.lower().split(".")[-1]
+        seletor_arquivo_obj = SeletorArquivos()
+        arquivo_selecionado = seletor_arquivo_obj.file_path
+        if arquivo_selecionado is not None:
+            self.arquivo = arquivo_selecionado
+            
+    #tarefa 2: identificar o tipo do arquivo pela extensão
+    def identificar_tipo_arquivo(arquivo):
+        extensao = arquivo.lower().split(".")[-1]
         if extensao == "epub":
             return "EPUB"
         elif extensao == "docx":
@@ -38,9 +44,10 @@ class LeitorArquivos:
         else:
             return None
 
+    #tarefa 3: extrair o texto do arquivo
     @staticmethod
     def extrair_texto(arquivo, limite_palavras, posicao_leitura):
-        tipo_arquivo = LeitorArquivos.get_tipo_arquivo(arquivo)
+        tipo_arquivo = LeitorArquivos.identificar_tipo_arquivo(arquivo)
         if tipo_arquivo is None:
             print("Tipo de arquivo não suportado.")
             return ""
@@ -55,8 +62,8 @@ class LeitorArquivos:
         elif tipo_arquivo == "MOBI":
             texto_completo = LeitorArquivos.extrair_texto_mobi(arquivo, limite_palavras, posicao_leitura)
 
-        return texto_completo
-
+        return texto_completo 
+    
     @staticmethod
     def extrair_texto_epub(arquivo_epub, limite_palavras, posicao_leitura):
         livro = epub.read_epub(arquivo_epub)
@@ -105,3 +112,5 @@ class LeitorArquivos:
             if len(palavras) >= limite_palavras:
                 break
         return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
+
+    #tarefa 4: exibir o texto extraído em uma janela com PDFViewer

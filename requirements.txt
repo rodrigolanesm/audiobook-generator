@@ -1,4 +1,4 @@
---upgrade pymupdf
+pymupdf
 tk
 pyttsx3
 ebooklib

@@ -12,7 +12,7 @@ class SeletorArquivos(tk.Tk):
         self.label = tk.Label(self, text="Selecione o arquivo a ser aberto:")
         self.label.pack(pady=10)
 
-        self.button = tk.Button(self, text="Selecionar Arquivo", command=self.select_file)
+        self.button = tk.Button(self, text="Selecionar Arquivo", command=self.selecionar_arquivo)
         self.button.pack()
 
     def selecionar_arquivo(self):
