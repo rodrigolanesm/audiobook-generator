@@ -1,97 +1,98 @@
-"""
-Nome: Henrique Andrade
-E-mail: henrique.andrade@academico.ufpb.br
-Data de Criação: 21/03/2024
-Última Atualização: 24/04/2024 - 22:37:45
-Linguagem: Python
-
-Descrição: Menu inicial
-
-"""
-
 import pyttsx3
 from leitor_arquivos import LeitorArquivos
 from interface import FileSelector
+import tkinter as tk
+from leitor_arquivos import LeitorArquivos
+from interface import FileSelector
+from PyPDF2 import PdfReader, PdfWriter
+import ebooklib
+from ebooklib import epub
+from docx import Document
+# PyMobi is not a standard library and may not be available
 
-class Menu:
+import fitz
+
+import tkinter as tk
+from tkinter import simpledialog, messagebox, filedialog
+from gtts import gTTS
+from playsound import playsound
+import os
+from leitor_arquivos import LeitorArquivos
+
+class Menu(tk.Tk):
     def __init__(self):
-        self.engine = pyttsx3.init()
+        super().__init__()
+        self.title("Menu")
+        self.geometry("400x200")
 
-    def falar(self, texto):
-        self.engine.say(texto)
-        self.engine.runAndWait()
+        self.button1 = tk.Button(self, text="Ler arquivo", command=self.ler_arquivo)
+        self.button1.pack(pady=10)
 
-    def exibir_menu(self):
-        while True:
-            print("Escolha o tipo de ação:")
-            print("1. Ler arquivo")
-            print("2. Limpar histórico de um arquivo específico")
-            print("3. Limpar histórico de todos os arquivos")
-            print("4. Sair")
-            opcao = input("Digite o número da opção desejada: ")
-            
-            if opcao == "4":
-                print("Saindo do programa...")
-                break
-            
-            if opcao not in ["1", "2", "3"]:
-                print("Opção inválida. Por favor, escolha uma das opções disponíveis.")
-                continue
-            
-            if opcao == "1":
-                self.ler_arquivo()
-            elif opcao == "2":
-                self.limpar_historico_arquivo()
-            elif opcao == "3":
-                self.limpar_historico_todos()
+        self.button2 = tk.Button(self, text="Limpar histórico de um arquivo específico", command=self.limpar_historico_arquivo)
+        self.button2.pack(pady=10)
+
+        self.button3 = tk.Button(self, text="Limpar histórico de todos os arquivos", command=self.limpar_historico_todos)
+        self.button3.pack(pady=10)
+
+        self.button4 = tk.Button(self, text="Sair", command=self.quit)
+        self.button4.pack(pady=10)
 
     def ler_arquivo(self):
-        file_selector = FileSelector()
-        file_selector.mainloop()
-        arquivo_selecionado = file_selector.file_path
-
-        if not arquivo_selecionado:
-            print("Nenhum arquivo selecionado.")
+        arquivo = self.selecionar_arquivo()
+        if not arquivo:
+            messagebox.showinfo("Informação", "Nenhum arquivo selecionado.")
             return
 
-        tipo_arquivo = LeitorArquivos.get_tipo_arquivo(arquivo_selecionado)
-        if tipo_arquivo is None:
-            print("Tipo de arquivo não suportado.")
+        tipo_arquivo = arquivo.split('.')[-1]
+        if tipo_arquivo not in ('pdf', 'docx', 'epub'):
+            messagebox.showinfo("Informação", "Tipo de arquivo não suportado.")
             return
 
-        posicao_leitura = 0
-        # Estimativa média da quantidade de palavras por página do arquivo 275
-        limite_palavras = 20
+        if tipo_arquivo == 'pdf':
+            self.ler_pdf(arquivo)
+        elif tipo_arquivo == 'docx':
+            self.ler_docx(arquivo)
+        elif tipo_arquivo == 'epub':
+            self.ler_epub(arquivo)
 
-        historico = self.carregar_historico()
-        if arquivo_selecionado in historico:
-            posicao_leitura = historico[arquivo_selecionado]
-            print(f"Retomando leitura do arquivo {arquivo_selecionado} na posição {posicao_leitura}.")
+    def selecionar_arquivo(self):
+        return filedialog.askopenfilename()
 
-        while True:
-            texto = LeitorArquivos.extrair_texto(arquivo_selecionado, limite_palavras, posicao_leitura)
+    def ler_pdf(self, arquivo):
+        startnum = simpledialog.askstring("Input", "Qual é o número da primeira página?  ")
+        endnum = simpledialog.askstring("Input", "Qual é o número da última página?  ")
 
-            print("Texto extraído:")
-            print(texto)
+        try:
+            start_page = int(startnum) - 1
+            end_page = int(endnum)
+
+            output_filename = simpledialog.askstring("Input", "Digite o nome do arquivo de saída, sem a extensão .pdf: ")
+
+            texto = LeitorArquivos.extrair_texto_pdf(arquivo, start_page, end_page)  
+
             self.falar(texto)
 
-            continuar = input("Deseja continuar a leitura deste arquivo? (s/n): ").lower()
-            if continuar == "n":
-                break
-            elif continuar == "s":
-                opcao_continuar = input("Deseja:\n1. Ir para a página anterior\n2. Repetir a página\n3. Ir para a próxima página\nDigite o número da opção desejada: ")
-                if opcao_continuar == "1" and posicao_leitura >= limite_palavras:
-                    posicao_leitura -= limite_palavras
-                elif opcao_continuar == "2":
-                    continue
-                elif opcao_continuar == "3":
-                    posicao_leitura += limite_palavras
-                else:
-                    print("Opção inválida. Voltando para o menu inicial.")
-                    break
+            output_filename = output_filename + '.pdf'
+            messagebox.showinfo("Informação", f'O arquivo {output_filename} foi criado com sucesso.')
+        except (ValueError, RuntimeError) as e:
+            messagebox.showinfo("Erro", f"Erro ao processar o arquivo PDF: {e}")
 
-        # Salvar informações de leitura no histórico
-        self.salvar_historico(arquivo_selecionado, posicao_leitura)
+    def falar(self, texto):
+        tts = gTTS(text=texto, lang='pt-br', slow=False)
+        filename = 'audio.mp3'
+        tts.save(filename)
+        playsound(filename)
+        os.remove(filename)
+
+    def ler_docx(self, arquivo):
+        doc = Document(arquivo)
+        for paragraph in doc.paragraphs:
+            messagebox.showinfo("Texto extraído", paragraph.text)
+
+    def ler_epub(self, arquivo):
+        book = epub.read_epub(arquivo)
+        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+            messagebox.showinfo("Texto extraído", item.get_content())
 
     def carregar_historico(self):
         historico = {}
@@ -112,24 +113,21 @@ class Menu:
                 file.write(f"{arquivo}|{posicao_leitura}\n")
 
     def limpar_historico_arquivo(self):
-        arquivo = input("Digite o nome do arquivo para limpar o histórico: ")
+        arquivo = simpledialog.askstring("Input", "Digite o nome do arquivo para limpar o histórico: ")
         historico = self.carregar_historico()
         if arquivo in historico:
             del historico[arquivo]
             with open("historico.txt", "w") as file:
                 for arquivo_historico, posicao_leitura in historico.items():
                     file.write(f"{arquivo_historico}|{posicao_leitura}\n")
-            print(f"Histórico do arquivo {arquivo} limpo com sucesso.")
+            messagebox.showinfo("Informação", f"Histórico do arquivo {arquivo} limpo com sucesso.")
         else:
-            print(f"Nenhum histórico encontrado para o arquivo {arquivo}.")
+            messagebox.showinfo("Informação", f"Nenhum histórico encontrado para o arquivo {arquivo}.")
 
     def limpar_historico_todos(self):
         try:
             open("historico.txt", "w").close()
-            print("Histórico de todos os arquivos limpo com sucesso.")
+            messagebox.showinfo("Informação", "Histórico de todos os arquivos limpo com sucesso.")
         except Exception as e:
-            print("Erro ao limpar o histórico de todos os arquivos:", e)
+            messagebox.showinfo("Erro", f"Erro ao limpar o histórico de todos os arquivos: {e}")
 
-if __name__ == "__main__":
-    menu = Menu()
-    menu.exibir_menu()

@@ -1,14 +1,3 @@
-"""
-Nome: Saulo Costa
-E-mail: scm2@academico.ufpb.br
-Data de Criação: 21/03/2024
-Última Atualização: 27/04/2024 - 14:58:27
-Linguagem: Python
-
-Descrição: Leitura de arquivos
-
-"""
-
 from ebooklib import epub
 from docx import Document
 import fitz, ebooklib, re
@@ -16,12 +5,26 @@ from gtts import gTTS
 from playsound import playsound
 import os
 
+"""
+speak(text): Esta função recebe um texto como entrada e utiliza a biblioteca gTTS 
+para converter o texto em fala usando a voz em português do Brasil. Em seguida, 
+salva o áudio em um arquivo temporário, reproduz o áudio usando a biblioteca playsound
+e remove o arquivo temporário depois que a reprodução é concluída.
+"""
+
 def speak(text):
     tts = gTTS(text=text, lang='pt-br', slow=False)
     filename = 'audio.mp3'
     tts.save(filename)
     playsound(filename)
     os.remove(filename)
+
+"""
+get_tipo_arquivo(nome_arquivo): determina o tipo de arquivo 
+com base em sua extensão. Ele recebe o nome do arquivo como entrada, extrai 
+a extensão do nome do arquivo e retorna o tipo de arquivo correspondente 
+(EPUB, DOCX, PDF, MOBI) ou None se o tipo de arquivo não for suportado.
+"""
 
 class LeitorArquivos:
     @staticmethod
@@ -37,6 +40,12 @@ class LeitorArquivos:
             return "MOBI"
         else:
             return None
+        
+    """
+extrair_texto, Esta função extrai o texto de um arquivo de acordo com o tipo de arquivo fornecido. Ela chama
+a função apropriada para extrair o texto com base no tipo de arquivo e, em seguida,
+converte o texto em fala usando a função speak. Finalmente, retorna o texto extraído.
+"""
 
     @staticmethod
     def extrair_texto(arquivo, limite_palavras, posicao_leitura):
@@ -86,10 +95,10 @@ class LeitorArquivos:
         return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
 
     @staticmethod
-    def extrair_texto_pdf(arquivo_pdf, limite_palavras, posicao_leitura):
+    def extrair_texto_pdf(arquivo_pdf, start_page, end_page, limite_palavras=1000, posicao_leitura=0):
         texto_completo = ''
         doc = fitz.open(arquivo_pdf)
-        for page_num in range(len(doc)):
+        for page_num in range(start_page, end_page):
             texto_pagina = doc[page_num].get_text()
             texto_completo += texto_pagina
             palavras = texto_completo.split()
@@ -108,3 +117,9 @@ class LeitorArquivos:
             if len(palavras) >= limite_palavras:
                 break
         return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
+    
+    @staticmethod
+    def listar_arquivos(diretorio):
+        for nome in os.listdir(diretorio):
+            if os.path.isfile(os.path.join(diretorio, nome)):
+                print(nome)
