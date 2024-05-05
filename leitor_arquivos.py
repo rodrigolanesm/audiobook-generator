@@ -1,17 +1,27 @@
 """
-Nome: Henrique Andrade
-E-mail: henrique.andrade@academico.ufpb.br
+Nome: Saulo Costa
+E-mail: scm2@academico.ufpb.br
 Data de Criação: 21/03/2024
-Última Atualização: 24/04/2024 - 22:43:19
+Última Atualização: 27/04/2024 - 14:58:27
 Linguagem: Python
 
-Descrição: Realizar a leitura dos arquivos
+Descrição: Leitura de arquivos
 
 """
 
 from ebooklib import epub
 from docx import Document
 import fitz, ebooklib, re
+from gtts import gTTS
+from playsound import playsound
+import os
+
+def speak(text):
+    tts = gTTS(text=text, lang='pt-br', slow=False)
+    filename = 'audio.mp3'
+    tts.save(filename)
+    playsound(filename)
+    os.remove(filename)
 
 class LeitorArquivos:
     @staticmethod
@@ -44,6 +54,9 @@ class LeitorArquivos:
             texto_completo = LeitorArquivos.extrair_texto_pdf(arquivo, limite_palavras, posicao_leitura)
         elif tipo_arquivo == "MOBI":
             texto_completo = LeitorArquivos.extrair_texto_mobi(arquivo, limite_palavras, posicao_leitura)
+
+        # Chame a função speak aqui
+        speak(texto_completo)
 
         return texto_completo
 
