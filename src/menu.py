@@ -24,7 +24,7 @@ class Menu:
         #botões para as opções
         button1 = tk.Button(self.root, text="1) Ler Arquivo", command=self.ler_arquivo)
         button1.pack()
-    
+        
         button2 = tk.Button(self.root, text="2) Visualizar histórico", command=self.visualizar_historico)
         button2.pack()
         

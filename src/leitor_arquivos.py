@@ -31,8 +31,8 @@ class LeitorArquivos:
             self.arquivo = arquivo_selecionado
             
     #tarefa 2: identificar o tipo do arquivo pela extensão
-    def identificar_tipo_arquivo(arquivo):
-        extensao = arquivo.lower().split(".")[-1]
+    def identificar_tipo_arquivo(self):
+        extensao = self.arquivo.lower().split(".")[-1]
         if extensao == "epub":
             return "EPUB"
         elif extensao == "docx":
