@@ -14,7 +14,7 @@ from tkinter import simpledialog, messagebox, filedialog
 from gtts import gTTS
 from playsound import playsound
 import html2text
-import datetime
+import shutil
 
 import os
 
@@ -61,12 +61,34 @@ class Menu(tk.Tk):
     def selecionar_arquivo(self):
         return filedialog.askopenfilename()
     
-    def falar(self, texto):
+    def falar(self, texto, arquivo, start, end):
         tts = gTTS(text=texto, lang='pt-br', slow=False)
-        filename = 'audio.mp3'
+        filename = f'{arquivo}_{start}-{end}.mp3'
         tts.save(filename)
         playsound(filename)
-        os.remove(filename)
+
+        # Crie a pasta 'livros' se ela não existir
+        if not os.path.exists('livros'):
+            os.makedirs('livros')
+
+        # Extraia apenas o nome base do arquivo (sem o caminho e sem a extensão)
+        nome_base = os.path.basename(arquivo).split('.')[0]
+
+        # Crie a pasta com o nome base do arquivo dentro da pasta 'livros' se ela não existir
+        pasta = f'livros/{nome_base}'
+        if not os.path.exists(pasta):
+            os.makedirs(pasta)
+
+        # Extraia apenas o nome do arquivo (sem o caminho)
+        nome_arquivo = os.path.basename(filename)
+
+        # Mova o arquivo de áudio para a pasta do livro dentro da pasta 'livros'
+        shutil.move(filename, f'{pasta}/{nome_arquivo}')
+
+
+
+
+
 
     def ler_pdf(self, arquivo):
         startnum = simpledialog.askstring("Input", "Qual é o número da primeira página?  ")
@@ -118,7 +140,7 @@ class Menu(tk.Tk):
             messagebox.showinfo("Informação", f'O arquivo {output_filename} foi aberto com sucesso.')
             
             #self.after(1000, self.falar, texto)
-            threading.Thread(target=self.falar, args=(texto,)).start()
+            threading.Thread(target=self.falar, args=(texto, arquivo, start_page, end_page)).start()
             
         except (ValueError, RuntimeError) as e:
             messagebox.showinfo("Erro", f"Erro ao processar o arquivo PDF: {e}")
@@ -150,8 +172,7 @@ class Menu(tk.Tk):
             text_widget.pack(expand=True, fill='both')
 
             # Inicie a reprodução do áudio depois que o texto for carregado
-            threading.Thread(target=self.falar, args=(texto,)).start()
-
+            threading.Thread(target=self.falar, args=(texto, arquivo, start_paragraph, end_paragraph)).start()
             messagebox.showinfo("Informação", f'O arquivo {arquivo} foi aberto com sucesso.')
             
         except (ValueError, RuntimeError) as e:
@@ -195,17 +216,6 @@ class Menu(tk.Tk):
         except (ValueError, RuntimeError) as e:
             messagebox.showinfo("Erro", f"Erro ao processar o arquivo EPUB: {e}")
 
-    def carregar_historico(self):
-        historico = {}
-        try:
-            with open("historico.txt", "r") as file:
-                for line in file:
-                    arquivo, posicao_leitura = line.strip().split("|")
-                    historico[arquivo] = int(posicao_leitura)
-        except FileNotFoundError:
-            pass
-        return historico
-    
     
     def salvar_historico(self, arquivo, intervalo):
         # Crie o diretório "historico" se ele não existir
