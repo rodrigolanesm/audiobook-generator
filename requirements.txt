@@ -1,6 +1,9 @@
 pymupdf
 tk
 pyttsx3
+gtts
 ebooklib
 python-docx
 fitz
+pdf2image
+html2text

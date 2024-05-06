@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from leitor_arquivos import LeitorArquivos
+from historico import Historico
 
 class Menu:
     def __init__(self):
@@ -10,34 +11,40 @@ class Menu:
         
         self.root.geometry("600x600")
         
-        self.create_menu()
+        self.criar_menu()
         
-    def create_menu(self):
+    def criar_menu(self):
         #exibe o título do programa destacado em negrito e com fonte maior
         title = tk.Label(self.root, text="Gerador de Audiobooks", font=("Helvetica", 16, "bold"))
-        title.pack()
+        title.pack(pady=10)
         
         #guia de opções
         label = tk.Label(self.root, text="Selecione uma opção:")
-        label.pack()
+        label.pack(pady=10)
         
         #botões para as opções
         button1 = tk.Button(self.root, text="1) Ler Arquivo", command=self.ler_arquivo)
-        button1.pack()
+        button1.pack(pady=10)
     
-        button2 = tk.Button(self.root, text="2) Visualizar histórico", command=self.visualizar_historico)
-        button2.pack()
+        button2 = tk.Button(self.root, text="2) Histórico", command=self.menu_historico)
+        button2.pack(pady=10)
         
         button3 = tk.Button(self.root, text="3) Sair", command=self.sair)
-        button3.pack()
+        button3.pack(pady=10)
         
     def ler_arquivo(self):
         #instancia um objeto da classe LeitorArquivos
-        leitor_arquivo = LeitorArquivos()
+        leitor_arquivo = LeitorArquivos()        
+        leitor_arquivo.selecionar_arquivo()
+        leitor_arquivo.identificar_tipo_arquivo()
+        #self.extrair_texto()
+        leitor_arquivo.ler(leitor_arquivo.arquivo)
+
         
-    def visualizar_historico(self):
-        # Lógica para visualizar o histórico
-        messagebox.showinfo("Visualizar Histórico", "Opção Visualizar Histórico selecionada")
+    def menu_historico(self):
+        #instancia um objeto da classe Historico
+        historico = Historico()
+        
         
     def sair(self):
         self.root.destroy()
