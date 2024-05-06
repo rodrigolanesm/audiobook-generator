@@ -9,6 +9,7 @@ from PIL import ImageTk, Image
 import threading
 import os
 from gtts import gTTS
+from interface_pdf import Interface_PDF
 
 class LeitorArquivos:
     #O leitor de arquivos deve realizar 5 tarefas:
@@ -23,12 +24,13 @@ class LeitorArquivos:
     
     def __init__(self):
         self.arquivo = None
+        self.extensao = None
         
         #janela principal 600x600
         self.root = tk.Tk()
         self.root.title("Leitor de Arquivos")
         
-        self.root.geometry("600x600")
+        self.root.geometry("400x400")
         
         self.criar_menu()
         
@@ -44,15 +46,12 @@ class LeitorArquivos:
         #botões para as opções
         button1 = tk.Button(self.root, text="1) Selecionar Arquivo", command=self.selecionar_arquivo)
         button1.pack(pady=10)
-    
-        button2 = tk.Button(self.root, text="2) Identificar tipo ", command=self.identificar_tipo_arquivo)
+        
+        button2 = tk.Button(self.root, text="2) Ler", command= self.ler)
         button2.pack(pady=10)
         
-        button3 = tk.Button(self.root, text="3) Ler", command=lambda: self.ler(self.arquivo))
+        button3 = tk.Button(self.root, text="3) Sair", command=self.sair)
         button3.pack(pady=10)
-        
-        button4 = tk.Button(self.root, text="4) Sair", command=self.sair)
-        button4.pack(pady=10)
     
     def sair(self):
         self.root.destroy()
@@ -61,26 +60,28 @@ class LeitorArquivos:
     def selecionar_arquivo(self):
         seletor_arquivo_obj = SeletorArquivos()
         arquivo_selecionado = seletor_arquivo_obj.file_path
+        print("[OK] arquivo_selecionado: " + arquivo_selecionado)
         if arquivo_selecionado is not None:
             self.arquivo = arquivo_selecionado
             
     #tarefa 2: identificar o tipo do arquivo pela extensão
     def identificar_tipo_arquivo(self):
-        print("*********************************** C H E G O U       A Q U I *******************************************" )
-        extensao = self.arquivo.lower().split(".")[-1]
-        if extensao == "epub":
-            return "EPUB"
-        elif extensao == "docx":
-            return "DOCX"
-        elif extensao == "pdf":
-            return "PDF"
-        elif extensao == "mobi":
-            return "MOBI"
+        arquivo = self.arquivo
+        
+        extensao = arquivo.split(".")[-1]
+        if extensao == "epub" or extensao == "EPUB":
+            return "epub"
+        elif extensao == "docx" or extensao == "DOCX":
+            return "docx"
+        elif extensao == "pdf" or extensao == "PDF":
+            return "pdf"
+        elif extensao == "mobi" or extensao == "MOBI":
+            return "mobi"
         else:
             return None
 
     #tarefa 3: extrair o texto do arquivo
-    @staticmethod
+    """ @staticmethod
     def extrair_texto(arquivo, limite_palavras, posicao_leitura):
         tipo_arquivo = LeitorArquivos.identificar_tipo_arquivo(arquivo)
         if tipo_arquivo is None:
@@ -88,17 +89,17 @@ class LeitorArquivos:
             return ""
 
         texto_completo = ''
-        if tipo_arquivo == "EPUB":
+        if tipo_arquivo == "EPUB" or tipo_arquivo == "epub":
             texto_completo = LeitorArquivos.extrair_texto_epub(arquivo, limite_palavras, posicao_leitura)
-        elif tipo_arquivo == "DOCX":
+        elif tipo_arquivo == "DOCX" or tipo_arquivo == "docx":
             texto_completo = LeitorArquivos.extrair_texto_docx(arquivo, limite_palavras, posicao_leitura)
-        elif tipo_arquivo == "PDF":
+        elif tipo_arquivo == "PDF" or tipo_arquivo == "pdf":
             texto_completo = LeitorArquivos.extrair_texto_pdf(arquivo, limite_palavras, posicao_leitura)
-        elif tipo_arquivo == "MOBI":
+        elif tipo_arquivo == "MOBI" or tipo_arquivo == "mobi":
             texto_completo = LeitorArquivos.extrair_texto_mobi(arquivo, limite_palavras, posicao_leitura)
 
         return texto_completo 
-    
+     """
     @staticmethod
     def extrair_texto_epub(arquivo_epub, limite_palavras, posicao_leitura):
         livro = epub.read_epub(arquivo_epub)
@@ -125,10 +126,10 @@ class LeitorArquivos:
         return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
 
     @staticmethod
-    def extrair_texto_pdf(arquivo_pdf, limite_palavras, posicao_leitura):
+    def extrair_texto_pdf(arquivo_pdf, start_page, end_page, limite_palavras=1000, posicao_leitura=0):
         texto_completo = ''
         doc = fitz.open(arquivo_pdf)
-        for page_num in range(len(doc)):
+        for page_num in range(start_page, end_page):
             texto_pagina = doc[page_num].get_text()
             texto_completo += texto_pagina
             palavras = texto_completo.split()
@@ -148,75 +149,34 @@ class LeitorArquivos:
                 break
         return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
 
-    #tarefa 4: exibir o texto extraído em uma janela com PDFViewer
-    def ler(self, arquivo):
-        startnum = simpledialog.askstring("Input", "Ler a partir de qual página?  ")
-        #endnum = simpledialog.askstring("Input", "Qual é o número da última página?  ")
+    #tarefa 4: exibir o texto extraído em uma janela com PDF2image
+    def ler(self):
+        arquivo = self.arquivo
+        self.extensao = self.identificar_tipo_arquivo()
+        print("[OK] Identificou o arquivo e extensão: " + arquivo + " - " + self.extensao)
+        
+        if self.extensao == "pdf":
+            self.ler_pdf(arquivo)  
+        if self.extensao == "epub":
+            #texto = LeitorArquivos.extrair_texto_epub(arquivo, start_page, end_page)
+            pass
+        if self.extensao == "docx":
+            #texto = LeitorArquivos.extrair_texto_docx(arquivo, start_page, end_page)
+            pass
+        if self.extensao == "mobi":
+            #texto = LeitorArquivos.extrair_texto_mobi(arquivo, start_page, end_page)
+            pass
 
-        try:
-            start_page = int(startnum) - 1
-            end_page = int(startnum)        #pagina seguinte ao start_page
-
-            output_filename = arquivo.split('/')[-1].split('.')[0]+'|pags'+str(start_page+1)+'-'+str(end_page)
-
-            if self.extensao == "pdf":
-                texto = LeitorArquivos.extrair_texto_pdf(arquivo, start_page, end_page)  
-            if self.extensao == "epub":
-                texto = LeitorArquivos.extrair_texto_epub(arquivo, start_page, end_page)
-            if self.extensao == "docx":
-                texto = LeitorArquivos.extrair_texto_docx(arquivo, start_page, end_page)
-            if self.extensao == "mobi":
-                texto = LeitorArquivos.extrair_texto_mobi(arquivo, start_page, end_page)
-
-            output_filename = output_filename + '.pdf'
-            
-            # Converta as páginas selecionadas do PDF em imagens
-            images = convert_from_path(arquivo, first_page=start_page+1, last_page=end_page)
-            #images = convert_from_path(arquivo, first_page=start_page+1, last_page=end_page + 1)
-            
-            # Crie uma nova janela para exibir as imagens
-            image_window = tk.Toplevel(self)
-            image_window.title(output_filename)
-
-            # Crie um Canvas e uma barra de rolagem
-            canvas = Canvas(image_window)
-            scrollbar = Scrollbar(image_window, command=canvas.yview)
-            canvas.config(yscrollcommand=scrollbar.set)
-
-            # Crie um Frame para conter as imagens e adicione-o ao Canvas
-            frame = Frame(canvas)
-            frame_id = canvas.create_window((0,0), window=frame, anchor='nw')
-
-            for i, img in enumerate(images):
-                # Converta a imagem PIL em uma imagem Tkinter
-                tk_image = ImageTk.PhotoImage(img)
-                label = tk.Label(frame, image=tk_image)
-                label.image = tk_image  # Mantenha uma referência à imagem
-                label.pack()
-
-                # Atualize o scrollregion após a configuração do conteúdo do frame
-                canvas.itemconfig(frame_id, width=img.width, height=(i+1)*img.height)
-                canvas.config(scrollregion=canvas.bbox('all'))
-
-            # Empacote o Canvas e a barra de rolagem
-            canvas.pack(side='left', fill='both', expand=True)
-            scrollbar.pack(side='right', fill='y')
-            
-            # Mensagem de confirmação de sucesso
-            #messagebox.showinfo("Informação", f'O arquivo {output_filename} foi aberto com sucesso.')
-            
-            #self.after(1000, self.falar, texto)
-            threading.Thread(target=self.falar, args=(texto,)).start()
-            
-            #registra as páginas lidas no histórico
-            self.historico.salvar_leitura(output_filename, texto)
-            
-        except (ValueError, RuntimeError) as e:
-            messagebox.showinfo("Erro", f"Erro ao processar o arquivo PDF: {e}")
-
+    def ler_pdf(self, arquivo):
+        interface_pdf = Interface_PDF(arquivo=arquivo)
+        interface_pdf.exibir_pdf()
     def falar(self, texto):
         tts = gTTS(text=texto, lang='pt-br', slow=False)
-        filename = 'audio.mp3'
-        tts.save("data/audiobooks/"+filename)
-        os.system("start data/audiobooks/"+ filename)
-        #os.remove(filename)
+        audio_filename = f'{self.output_filename}' + '|' + f'{self.start.page}' + '.mp3'
+        tts.save("data/audiobooks/"+audio_filename)
+        os.system("start data/audiobooks/"+ audio_filename)
+        #os.remove(audio_filename)
+
+if __name__ == "__main__":
+    leitor = LeitorArquivos()
+    leitor.root.mainloop()

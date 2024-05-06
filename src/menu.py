@@ -9,7 +9,7 @@ class Menu:
         self.root = tk.Tk()
         self.root.title("Gerador de Audiobooks")
         
-        self.root.geometry("600x600")
+        self.root.geometry("600x280")
         
         self.criar_menu()
         
@@ -34,12 +34,7 @@ class Menu:
         
     def ler_arquivo(self):
         #instancia um objeto da classe LeitorArquivos
-        leitor_arquivo = LeitorArquivos()        
-        leitor_arquivo.selecionar_arquivo()
-        leitor_arquivo.identificar_tipo_arquivo()
-        #self.extrair_texto()
-        leitor_arquivo.ler(leitor_arquivo.arquivo)
-
+        leitor_arquivo = LeitorArquivos()
         
     def menu_historico(self):
         #instancia um objeto da classe Historico
