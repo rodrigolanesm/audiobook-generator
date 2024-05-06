@@ -11,30 +11,41 @@ import os
 from gtts import gTTS
 
 class Interface_PDF:
-    def __init__(self, arquivo):
+    def __init__(self, arquivo, start_page, end_page):
         self.arquivo = arquivo
         self.extensao = "pdf"
+        self.texto = ""
+        self.start_page = start_page
+        self.end_page = end_page
     
-    def exibir_pdf(self):
-        startnum = simpledialog.askstring("Input", "Qual é o número da primeira página?  ")
-        endnum = simpledialog.askstring("Input", "Qual é o número da última página?  ")
-
+    @staticmethod
+    def extrair_texto_pdf(arquivo_pdf, start_page, end_page, limite_palavras=1000, posicao_leitura=0):
+        start_page = start_page
+        end_page = end_page    
+    
+        texto_completo = ''
+        doc = fitz.open(arquivo_pdf)
+        for page_num in range(start_page, end_page):
+            texto_pagina = doc[page_num].get_text()
+            texto_completo += texto_pagina
+            palavras = texto_completo.split()
+            if len(palavras) >= limite_palavras:
+                break
+        return ' '.join(palavras[posicao_leitura:limite_palavras + posicao_leitura])
+            
+    def exibir_pdf(self, texto):
         try:
-            start_page = int(startnum) - 1
-            end_page = int(endnum)
-
             output_filename = simpledialog.askstring("Input", "Digite o nome do arquivo de saída, sem a extensão .pdf: ")
 
-            texto = self.extrair_texto_pdf(self.arquivo, start_page, end_page)  
-
+            texto = self.extrair_texto_pdf(self.arquivo, self.start_page, self.end_page)  
 
             output_filename = output_filename + '.pdf'
             
             # Converta as páginas selecionadas do PDF em imagens
-            images = convert_from_path(self.arquivo, first_page=start_page+1, last_page=end_page)
+            images = convert_from_path(self.arquivo, first_page=self.start_page+1, last_page=self.end_page)
 
             # Crie uma nova janela para exibir as imagens
-            image_window = tk.Toplevel(self)
+            image_window = tk.Toplevel()
             image_window.title(output_filename)
 
             # Crie um Canvas e uma barra de rolagem
@@ -72,7 +83,7 @@ class Interface_PDF:
             messagebox.showinfo("Erro", f"Erro ao processar o arquivo PDF: {e}")
             
     def falar(self, texto):
-        tts = gTTS(text=texto, lang='pt-br', slow=False)
+        tts = gTTS(text=self.texto, lang='pt-br', slow=False)
         audio_filename = f'{self.output_filename}' + '|' + f'{self.start.page}' + '.mp3'
         tts.save("data/audiobooks/"+audio_filename)
         os.system("start data/audiobooks/"+ audio_filename)

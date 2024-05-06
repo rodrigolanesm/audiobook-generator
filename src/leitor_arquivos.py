@@ -156,7 +156,7 @@ class LeitorArquivos:
         print("[OK] Identificou o arquivo e extensão: " + arquivo + " - " + self.extensao)
         
         if self.extensao == "pdf":
-            self.ler_pdf(arquivo)  
+            self.ler_pdf(self.arquivo)  
         if self.extensao == "epub":
             #texto = LeitorArquivos.extrair_texto_epub(arquivo, start_page, end_page)
             pass
@@ -168,8 +168,12 @@ class LeitorArquivos:
             pass
 
     def ler_pdf(self, arquivo):
-        interface_pdf = Interface_PDF(arquivo=arquivo)
-        interface_pdf.exibir_pdf()
+        start_page = int(simpledialog.askstring("Input", "Qual é o número da primeira página?  ")) - 1
+        end_page = int(simpledialog.askstring("Input", "Qual é o número da última página?  "))
+        
+        interface_pdf = Interface_PDF(arquivo, start_page, end_page)
+        interface_pdf.exibir_pdf(interface_pdf.extrair_texto_pdf())
+        
     def falar(self, texto):
         tts = gTTS(text=texto, lang='pt-br', slow=False)
         audio_filename = f'{self.output_filename}' + '|' + f'{self.start.page}' + '.mp3'

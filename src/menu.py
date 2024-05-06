@@ -40,7 +40,6 @@ class Menu:
         #instancia um objeto da classe Historico
         historico = Historico()
         
-        
     def sair(self):
         self.root.destroy()
 
